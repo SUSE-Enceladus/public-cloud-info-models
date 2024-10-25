@@ -38,7 +38,7 @@ setup(
         'dev': dev_requirements,
         'test': test_requirements
     },
-    license='GPLv3+',
+    license='Apache-2.0',
     zip_safe=False,
     keywords='pint_models pint-models',
     classifiers=[
@@ -46,8 +46,8 @@ setup(
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'License :: OSI Approved :: '
-        'GNU General Public License v3 or later (GPLv3+)','Natural Language :: English',
+        'License :: OSI Approved :: Apache Software License',
+        'Natural Language :: English',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',

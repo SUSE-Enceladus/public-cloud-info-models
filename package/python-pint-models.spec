@@ -23,7 +23,7 @@ Name:           python-pint-models
 Version:        0.0.1
 Release:        0
 Summary:        Contains a set of models and utilites for SUSE Pint Server
-License:        GPL-3.0-or-later
+License:        Apache-2.0
 URL:            https://github.com/SUSE-Enceladus/public-cloud-info-models
 Source:         pint-models-%{version}.tar.gz
 BuildRequires:  python-rpm-macros
