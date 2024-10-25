@@ -26,9 +26,9 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from pint_models.models import Base
 
 
-def get_environ_or_bust(key_name):
-    assert key_name in os.environ, 'Environment variable %s is required.' % (
-        key_name)
+def get_environ_entry(key_name):
+    if key_name not in os.environ:
+        raise Exception(f'Environment variable {key_name} is required.')
     return os.environ.get(key_name)
 
 
@@ -52,6 +52,106 @@ def create_db_logger(outputfile):
     db_logger = logging.getLogger('sqlalchemy')
     db_logger.addHandler(db_handler)
     db_logger.setLevel(db_logger_log_level)
+
+
+def create_postgres_url_from_config(dbconfig):
+    """Create postgres connection string from provided config
+
+    Args:
+        dbconfig: (dict): A dictionary of config settings
+            that are required to connect to the Postgres DB
+
+    Returns:
+        [string]: Postgres connection string
+    """
+
+    return _create_postgres_url(
+        db_user=dbconfig.get('user'),
+        db_password=dbconfig.get('password'),
+        db_name=dbconfig.get('dbname'),
+        db_host=dbconfig.get('host'),
+        db_port=dbconfig.get('port'),
+        # change the SSL stuff once we have a real DB to connect to
+        db_ssl_mode='',
+        db_root_cert=''
+    )
+
+
+def create_postgres_url_from_env():
+    """Create postgres connection string from environment settings
+
+    Returns:
+        [string]: Postgres connection string
+    """
+
+    return _create_postgres_url(
+        db_user=get_environ_entry('POSTGRES_USER'),
+        db_password=get_environ_entry('POSTGRES_PASSWORD'),
+        db_name=get_environ_entry('POSTGRES_DB'),
+        db_host=get_environ_entry('POSTGRES_HOST'),
+        db_port=os.environ.get('POSTGRES_PORT', 5432),
+        db_ssl_mode=os.environ.get('POSTGRES_SSL_MODE', None),
+        db_root_cert=os.environ.get('POSTGRES_SSL_ROOT_CERTIFICATE', None)
+    )
+
+
+def init_db(dbconfig=None, outputfile=None, echo=None,
+            hide_parameters=None, create_all=False):
+    # import all modules here that might define models so that
+    # they will be registered properly on the metadata.  Otherwise
+    # you will have to import them first before calling init_db()
+    """Setup DB scoped session
+
+    Args:
+        config (dict): A dictionary of config settings
+            that are required to connect to the Postgres DB
+        outputfile (filepath): File location to log SQL statements
+        echo (bool): Whether or not all statements are logged to the
+            default log handler
+            https://docs.sqlalchemy.org/en/14/core/engines.html#sqlalchemy.create_engine.params.echo
+        hide_parameters (bool): if false then statement parameters
+            will not be logged to INFO leverl log messages or in
+            logged representation of error reports.
+            https://docs.sqlalchemy.org/en/14/core/engines.html#sqlalchemy.create_engine.params.hide_parameters
+
+    Returns:
+        [scoped_session]: DB scoped_session to use for DB SQL operations
+    """
+
+    # Setup a dedicated DB logger if a target output file was provided
+    create_db_logger(outputfile)
+
+    # Create the DB engine, either from provided settings, or
+    # using relevant environment settings.
+    if dbconfig:
+        engine_url = create_postgres_url_from_config(dbconfig)
+    elif os.environ.get('DATABASE_URI', None):
+        engine_url = os.environ['DATABASE_URI']
+    else:
+        engine_url = create_postgres_url_from_env()
+
+    engine = create_engine(engine_url, convert_unicode=True,
+                           echo=echo, hide_parameters=hide_parameters)
+
+    db_session = scoped_session(sessionmaker(autocommit=False,
+                                             autoflush=False,
+                                             bind=engine))
+    Base.query = db_session.query_property()
+
+    if create_all:
+        Base.metadata.create_all(bind=engine)
+
+    return db_session
+
+
+def get_psql_server_version(db_session):
+    """Return the psql server version"""
+    result = db_session.execute("select version()")
+    for row in result:
+        version = re.search(r'PostgreSQL\s+\d+.\d+', str(row))
+        if version:
+            break
+    return version.group(0)
 
 
 def _create_postgres_url(db_user, db_password, db_name, db_host,
@@ -96,114 +196,3 @@ def _create_postgres_url(db_user, db_password, db_name, db_host,
                 'host': db_host,
                 'port': db_port,
                 'ssl': ssl_mode})
-
-
-def create_postgres_url_from_config(dbconfig):
-    """Create postgres connection string from provided config
-
-    Args:
-        dbconfig: (dict): A dictionary of config settings
-            that are required to connect to the Postgres DB
-
-    Returns:
-        [string]: Postgres connection string
-    """
-
-    return _create_postgres_url(
-        db_user=dbconfig.get('user'),
-        db_password=dbconfig.get('password'),
-        db_name=dbconfig.get('dbname'),
-        db_host=dbconfig.get('host'),
-        db_port=dbconfig.get('port'),
-        # change the SSL stuff once we have a real DB to connect to
-        db_ssl_mode='',
-        db_root_cert=''
-    )
-
-
-def create_postgres_url_from_env():
-    """Create postgres connection string from environment settings
-
-    Returns:
-        [string]: Postgres connection string
-    """
-
-    return _create_postgres_url(
-        db_user=get_environ_or_bust('POSTGRES_USER'),
-        db_password=get_environ_or_bust('POSTGRES_PASSWORD'),
-        db_name=get_environ_or_bust('POSTGRES_DB'),
-        db_host=get_environ_or_bust('POSTGRES_HOST'),
-        db_port=os.environ.get('POSTGRES_PORT', 5432),
-        db_ssl_mode=os.environ.get('POSTGRES_SSL_MODE', None),
-        db_root_cert=os.environ.get('POSTGRES_SSL_ROOT_CERTIFICATE', None)
-    )
-
-
-def init_db(dbconfig=None, outputfile=None, echo=None,
-            hide_parameters=None, create_all=False):
-    # import all modules here that might define models so that
-    # they will be registered properly on the metadata.  Otherwise
-    # you will have to import them first before calling init_db()
-    """Setup DB scoped session
-
-    Args:
-        config (dict): A dictionary of config settings
-            that are required to connect to the Postgres DB
-        outputfile (filepath): File location to log SQL statements
-        echo (bool): Whether or not all statements are logged to the
-            default log handler
-            https://docs.sqlalchemy.org/en/14/core/engines.html#sqlalchemy.create_engine.params.echo
-        hide_parameters (bool): if false then statement parameters
-            will not be logged to INFO leverl log messages or in
-            logged representation of error reports.
-            https://docs.sqlalchemy.org/en/14/core/engines.html#sqlalchemy.create_engine.params.hide_parameters
-
-    Returns:
-        [scoped_session]: DB scoped_session to use for DB SQL operations
-    """
-
-    # Setup a dedicated DB logger if a target output file was provided
-    create_db_logger(outputfile)
-
-    # Create the DB engine, either from provided settings, or
-    # using relevant environment settings.
-    if dbconfig:
-        engine_url = create_postgres_url_from_config(dbconfig)
-    elif os.environ.get('DATABASE_URI', None):
-        engine_url = os.environ['DATABASE_URI']
-    else:
-        engine_url = create_postgres_url_from_env()
-
-    # TODO(rtamalin): Remove this try/except hackery once we move forward
-    # to being based on SLE 15 SP3 or later.
-    try:
-        engine = create_engine(engine_url, convert_unicode=True,
-                               echo=echo, hide_parameters=hide_parameters)
-    except TypeError as e:
-        # If we failed because of the hide_parameters argument then
-        # try again without it.
-        if 'hide_parameters' in str(e):
-            engine = create_engine(engine_url, convert_unicode=True,
-                                   echo=echo)
-        else:
-            raise
-
-    db_session = scoped_session(sessionmaker(autocommit=False,
-                                             autoflush=False,
-                                             bind=engine))
-    Base.query = db_session.query_property()
-
-    if create_all:
-        Base.metadata.create_all(bind=engine)
-
-    return db_session
-
-
-def get_psql_server_version(db_session):
-    """Return the psql server version"""
-    result = db_session.execute("select version()")
-    for row in result:
-        version = re.search(r'PostgreSQL\s+\d+.\d+', str(row))
-        if version:
-            break
-    return version.group(0)

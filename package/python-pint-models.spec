@@ -16,7 +16,6 @@
 #
 
 %define upstream_name pint-models
-%define python python
 %{?sle15_python_module_pythons}
 
 Name:           python-pint-models
