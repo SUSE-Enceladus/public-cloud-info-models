@@ -27,10 +27,12 @@ URL:            https://github.com/SUSE-Enceladus/public-cloud-info-models
 Source:         pint-models-%{version}.tar.gz
 BuildRequires:  python-rpm-macros
 BuildRequires:  %{python_module SQLAlchemy}
+BuildRequires:  %{python_module psycopg2}
 BuildRequires:  %{python_module pip}
 BuildRequires:  %{python_module setuptools}
 BuildRequires:  %{python_module wheel}
 Requires:       python-SQLAlchemy
+Requires:       python-psycopg2
 BuildArch:      noarch
 %python_subpackages
 
