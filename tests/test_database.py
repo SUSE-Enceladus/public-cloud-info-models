@@ -4,8 +4,6 @@ from pint_models.database import (
     create_db_logger,
     get_environ_entry,
     create_postgres_url_from_config,
-    create_postgres_url_from_env,
-
 )
 
 
