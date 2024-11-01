@@ -43,5 +43,5 @@ classifiers = [
 dev = ['bumpversion', 'coverage', 'flake8', 'pytest-cov']
 test = ['coverage', 'flake8', 'pytest-cov']
 
-[tool.setuptools.package-dir]
-pint_models = 'pint_models'
+[tool.setuptools]
+packages = ['pint_models']
