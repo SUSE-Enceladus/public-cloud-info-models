@@ -20,7 +20,16 @@
 import enum
 import logging
 
-from sqlalchemy import Column, Date, Enum, Integer, Numeric, String, UniqueConstraint, Index
+from sqlalchemy import (
+    Column,
+    Date,
+    Enum,
+    Integer,
+    Numeric,
+    String,
+    UniqueConstraint,
+    Index
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import validates
@@ -58,7 +67,9 @@ class PintBase(object):
 
     @classmethod
     def unique_constraints(cls):
-        """Return the table's unique constraint's column names, or empty list."""
+        """
+        Return the table's unique constraint's column names, or empty list.
+        """
         return [u for u in cls.__table__.constraints
                 if isinstance(u, UniqueConstraint)]
 
@@ -94,31 +105,50 @@ class ProviderImageBase(PintBase):
         # respect to that publishedon value.
         if publishedon:
             if deprecatedon and deprecatedon < publishedon:
-                raise ValueError('Image %s invalid dates specified - '
-                                 'publishedon(%s) should not be after '
-                                 'deprecatedon(%s)' % (self.name,
-                                 str(publishedon), str(deprecatedon)))
+                raise ValueError(
+                    'Image %s invalid dates specified - '
+                    'publishedon(%s) should not be after '
+                    'deprecatedon(%s)' % (
+                        self.name,
+                        str(publishedon),
+                        str(deprecatedon)
+                    )
+                )
 
             if deletedon and deletedon < publishedon:
-                raise ValueError('Image %s invalid dates specified - '
-                                 'publishedon(%s) should not be after '
-                                 'deletedon(%s)' % (self.name,
-                                 str(publishedon), str(deletedon)))
+                raise ValueError(
+                    'Image %s invalid dates specified - '
+                    'publishedon(%s) should not be after '
+                    'deletedon(%s)' % (
+                        self.name,
+                        str(publishedon),
+                        str(deletedon)
+                    )
+                )
 
         if deprecatedon and deletedon and deletedon < deprecatedon:
-            raise ValueError('Image %s invalid dates specified - '
-                             'deprecatedon(%s) should not be after '
-                             'deletedon(%s)' % (self.name,
-                             str(deprecatedon), str(deletedon)))
+            raise ValueError(
+                'Image %s invalid dates specified - '
+                'deprecatedon(%s) should not be after '
+                'deletedon(%s)' % (
+                    self.name,
+                    str(deprecatedon),
+                    str(deletedon)
+                )
+            )
 
         return value
-
 
     @validates("changeinfo")
     def validate_changeinfo(self, key, value):
         if value and not value.endswith('/'):
             value = value + '/'
-            logger.info('%s.%s = %s (updated)', self.tablename, key, repr(value))
+            logger.info(
+                '%s.%s = %s (updated)',
+                self.tablename,
+                key,
+                repr(value)
+            )
 
         return value
 
@@ -134,7 +164,12 @@ class ProviderServerBase(PintBase):
     def validate_name(self, key, value):
         if self.type == ServerType.update:
             if not value:
-                raise ValueError("%s.%s cannot be null/empty for an update server." % (self.tablename, key))
+                raise ValueError(
+                    "%s.%s cannot be null/empty for an update server." % (
+                        self.tablename,
+                        key
+                    )
+                )
         return value
 
 
@@ -192,8 +227,20 @@ class AmazonServersModel(Base, ProviderServerBase):
     ipv6 = Column(postgresql.INET)
 
     __table_args__ = (
-        Index('uix_amazonservers_region_ip_not_null', 'region', 'ip', unique=True, postgresql_where=ip.isnot(None)),
-        Index('uix_amazonservers_region_ipv6_not_null', 'region', 'ipv6', unique=True, postgresql_where=ipv6.isnot(None)),
+        Index(
+            'uix_amazonservers_region_ip_not_null',
+            'region',
+            'ip',
+            unique=True,
+            postgresql_where=ip.isnot(None)
+        ),
+        Index(
+            'uix_amazonservers_region_ipv6_not_null',
+            'region',
+            'ipv6',
+            unique=True,
+            postgresql_where=ipv6.isnot(None)
+        ),
     )
 
 
@@ -208,8 +255,20 @@ class GoogleServersModel(Base, ProviderServerBase):
     ipv6 = Column(postgresql.INET)
 
     __table_args__ = (
-        Index('uix_googleservers_region_ip_not_null', 'region', 'ip', unique=True, postgresql_where=ip.isnot(None)),
-        Index('uix_googleservers_region_ipv6_not_null', 'region', 'ipv6', unique=True, postgresql_where=ipv6.isnot(None)),
+        Index(
+            'uix_googleservers_region_ip_not_null',
+            'region',
+            'ip',
+            unique=True,
+            postgresql_where=ip.isnot(None)
+        ),
+        Index(
+            'uix_googleservers_region_ipv6_not_null',
+            'region',
+            'ipv6',
+            unique=True,
+            postgresql_where=ipv6.isnot(None)
+        ),
     )
 
 
@@ -224,8 +283,20 @@ class MicrosoftServersModel(Base, ProviderServerBase):
     ipv6 = Column(postgresql.INET)
 
     __table_args__ = (
-        Index('uix_microsoftservers_region_ip_not_null', 'region', 'ip', unique=True, postgresql_where=ip.isnot(None)),
-        Index('uix_microsoftservers_region_ipv6_not_null', 'region', 'ipv6', unique=True, postgresql_where=ipv6.isnot(None)),
+        Index(
+            'uix_microsoftservers_region_ip_not_null',
+            'region',
+            'ip',
+            unique=True,
+            postgresql_where=ip.isnot(None)
+        ),
+        Index(
+            'uix_microsoftservers_region_ipv6_not_null',
+            'region',
+            'ipv6',
+            unique=True,
+            postgresql_where=ipv6.isnot(None)
+        ),
     )
 
 
