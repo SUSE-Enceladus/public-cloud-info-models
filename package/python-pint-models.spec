@@ -16,7 +16,11 @@
 #
 
 %define upstream_name pint-models
+%if 0%{?suse_version} >= 1600
+%define pythons %{primary_python}
+%else
 %{?sle15_python_module_pythons}
+%endif
 
 Name:           python-pint-models
 Version:        0.0.1
@@ -37,7 +41,7 @@ BuildArch:      noarch
 %python_subpackages
 
 %description
-Contains a set of models and utilites for SUSE Pint Server.
+Contains a set of models and utilites for SUSE Pint Server
 
 %prep
 %autosetup -n pint-models-%{version}
@@ -55,4 +59,3 @@ Contains a set of models and utilites for SUSE Pint Server.
 %{python_sitelib}/*
 
 %changelog
-
