@@ -130,8 +130,11 @@ def init_db(dbconfig=None, outputfile=None, echo=None,
     else:
         engine_url = create_postgres_url_from_env()
 
-    engine = create_engine(engine_url, convert_unicode=True,
-                           echo=echo, hide_parameters=hide_parameters)
+    engine = create_engine(
+        engine_url,
+        echo=echo,
+        hide_parameters=hide_parameters
+    )
 
     db_session = scoped_session(sessionmaker(autocommit=False,
                                              autoflush=False,
