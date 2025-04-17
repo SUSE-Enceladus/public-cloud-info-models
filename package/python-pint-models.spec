@@ -23,7 +23,7 @@
 %endif
 
 Name:           python-pint-models
-Version:        0.0.1
+Version:        0.1.0
 Release:        0
 Summary:        Contains a set of models and utilites for SUSE Pint Server
 License:        Apache-2.0

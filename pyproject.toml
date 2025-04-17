@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'pint-models'
-version = '0.0.1'
+version = '0.1.0'
 description = 'Contains a set of models and utilites for SUSE Pint Server.'
 readme = 'README.md'
 authors = [
