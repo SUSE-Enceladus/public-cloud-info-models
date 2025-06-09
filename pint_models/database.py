@@ -21,7 +21,7 @@ import logging
 import os
 import re
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from pint_models.models import Base
 
@@ -149,7 +149,7 @@ def init_db(dbconfig=None, outputfile=None, echo=None,
 
 def get_psql_server_version(db_session):
     """Return the psql server version"""
-    result = db_session.execute("select version()")
+    result = db_session.execute(text("select version()"))
     for row in result:
         version = re.search(r'PostgreSQL\s+\d+.\d+', str(row))
         if version:
