@@ -21,6 +21,7 @@
 %else
 %{?sle15_python_module_pythons}
 %endif
+%global _sitelibdir %{%{pythons}_sitelib}
 
 Name:           python-pint-models
 Version:        0.2.0
@@ -30,15 +31,14 @@ License:        Apache-2.0
 URL:            https://github.com/SUSE-Enceladus/public-cloud-info-models
 Source:         pint-models-%{version}.tar.gz
 BuildRequires:  python-rpm-macros
-BuildRequires:  %{python_module SQLAlchemy}
-BuildRequires:  %{python_module psycopg2}
-BuildRequires:  %{python_module pip}
-BuildRequires:  %{python_module setuptools}
-BuildRequires:  %{python_module wheel}
-Requires:       python-SQLAlchemy
-Requires:       python-psycopg2
+BuildRequires:  %{pythons}-SQLAlchemy
+BuildRequires:  %{pythons}-psycopg2
+BuildRequires:  %{pythons}-pip
+BuildRequires:  %{pythons}-setuptools
+BuildRequires:  %{pythons}-wheel
+Requires:       %{pythons}-SQLAlchemy
+Requires:       %{pythons}-psycopg2
 BuildArch:      noarch
-%python_subpackages
 
 %description
 Contains a set of models and utilites for SUSE Pint Server
@@ -52,10 +52,10 @@ Contains a set of models and utilites for SUSE Pint Server
 %install
 %pyproject_install
 
-%files %{python_files}
+%files
 %defattr(-,root,root)
 %license LICENSE
 %doc CHANGES.md README.md
-%{python_sitelib}/*
+%{_sitelibdir}/*
 
 %changelog
