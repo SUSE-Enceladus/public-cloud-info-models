@@ -202,7 +202,7 @@ class MicrosoftImagesModel(Base, ProviderImageBase):
     __tablename__ = 'microsoftimages'
     __table_args__ = (UniqueConstraint('name', 'environment'),)
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
     environment = Column(String(50), nullable=False)
     urn = Column(String(100))
