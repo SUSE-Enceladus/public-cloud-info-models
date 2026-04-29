@@ -23,7 +23,7 @@
 %global _sitelibdir %{%{pythons}_sitelib}
 
 Name:           public-cloud-info-models
-Version:        0.2.0
+Version:        0.3.0
 Release:        0
 Summary:        Contains a set of models and utilites for SUSE Pint Server
 License:        Apache-2.0
