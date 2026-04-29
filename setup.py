@@ -10,7 +10,7 @@ with open('README.md') as readme_file:
 
 
 setup(
-    name='pint-models',
+    name='public-cloud-info-models',
     version='0.0.1',
     description='Contains a set of models and utilites for SUSE Pint Server.',
     long_description=readme,

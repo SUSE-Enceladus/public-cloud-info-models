@@ -15,7 +15,6 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-%define upstream_name pint-models
 %if 0%{?suse_version} >= 1600
 %define pythons %{primary_python}
 %else
@@ -23,13 +22,13 @@
 %endif
 %global _sitelibdir %{%{pythons}_sitelib}
 
-Name:           python-pint-models
+Name:           public-cloud-info-models
 Version:        0.2.0
 Release:        0
 Summary:        Contains a set of models and utilites for SUSE Pint Server
 License:        Apache-2.0
 URL:            https://github.com/SUSE-Enceladus/public-cloud-info-models
-Source:         pint-models-%{version}.tar.gz
+Source:         %{name}-%{version}.tar.gz
 BuildRequires:  python-rpm-macros
 BuildRequires:  %{pythons}-SQLAlchemy
 BuildRequires:  %{pythons}-psycopg2
@@ -44,7 +43,7 @@ BuildArch:      noarch
 Contains a set of models and utilites for SUSE Pint Server
 
 %prep
-%autosetup -n pint-models-%{version}
+%autosetup -n %{name}-%{version}
 
 %build
 %pyproject_wheel
