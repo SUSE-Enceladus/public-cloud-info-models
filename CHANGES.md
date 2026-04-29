@@ -1,3 +1,10 @@
+v0.3.0 (2026-04-29)
+===================
+
+- Set microsoft table id to auto increment the id.
+- Cleanup package name, use public-cloud-info-models
+- Update spec file to build for one python
+
 v0.2.0 (2025-06-09)
 ===================
 
